@@ -1,0 +1,7 @@
+./emulate.sh
+adb forward tcp:12345 jdwp:2552
+jdb -attach localhost:12345
+adb shell gdbserver64 :5039 --attach 2552
+gdbclient 2552
+
+time milliseconds: echo $(($(date +%s%N)/1000000))

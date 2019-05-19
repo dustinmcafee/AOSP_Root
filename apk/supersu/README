@@ -1,0 +1,24 @@
+    start emulator with -writable-system
+    Install the SuperSu.apk
+    adb root
+    adb remount
+    adb -e push ./x86/su.pie /system/bin/su
+    adb –e shell
+    su root
+    cd /system/bin
+    chmod 06755 su
+    su --install
+    su --daemon&
+    setenforce 0
+    supolicy --live "allow appdomain input_device dir { ioctl read getattr search open }" "allow appdomain input_device chr_file { ioctl read write getattr lock append open }"
+
+    Install Terumx
+    apt update
+    apt upgrade
+    pkg install git clang tsu ncurses-utils
+    git clone https://gitlab.com/st42/termux-sudo
+    cd termux-sudo
+    cat sudo > /data/data/com.termux/files/usr/bin/sudo
+    chmod 700 /data/data/com.termux/files/usr/bin/sudo
+    sudo su
+    sudo tsu

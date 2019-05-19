@@ -1,0 +1,67 @@
+goldfish/.config must include: 
+CONFIG_DEBUG_INFO=y
+CONFIG_MESSAGE_LOGLEVEL_DEFAULT=7
+CONFIG_DEBUG_ENTRY=y 
+CONFIG_GDB_SCRIPTS=y 
+CONFIG_DYNAMIC_DEBUG=y
+DEFAULT_MESSAGE_LOGLEVEL=7
+CONFIG_MODULES=Y
+CONFIG_MODULE_UNLOAD=y
+CONFIG_STRICT_MEMORY_RWX=N
+CONFIG_DEVMEM=Y
+CONFIG_DEVKMEM=Y
+CONFIG_KALLSYMS=Y
+CONFIG_KALLSYMS_ALL=Y 
+CONFIG_DEBUG_INFO_DWARF4=y
+
+Add this to source file before an oops:
+printk(KERN_ALERT "DEBUG: Passed %s %d \n",__FUNCTION__,__LINE__);
+
+to gdb a PID in adb:
+/home/dustin/Android/Sdk/platform-tools/adb forward tcp:8700 tcp:8700
+gdbserver64 :8700 --attach ####(PID)
+gdbclient.py -p ####(PID) --port 8700
+
+
+eclipse -vmargs -Xmx2G -Xms1G -XX:MaxPermSize=1G
+
+create AVD:
+avdmanager -v create avd --package 'system-images;android-24;google_apis;x86_64' --path /home/dustin/Android/Sdk_Custom/ --name Custom_AVD --abi google_apis/x86_64 -d 8 --force
+
+/home/dustin/Android/Sdk/emulator/emulator -show-kernel -debug-all -kernel /home/dustin/AOSP/workingdir/Android_Source_Nougat/kernel/goldfish-3.10-n-dev/arch/x86/boot/bzImage -avd Nexus_5_API_24_x86_64 -wipe-data -qemu -s -S
+
+For DDD and DBG (remember to make with TARGET_BUILD_TYPE=debug, more info: http://www.informit.com/articles/article.aspx?p=2431417&seqNum=3):
+emulator -writable-system -verbose -show-kernel -netfast -qemu -s -S
+emulator -debug -verbose -show-kernel -qemu -S -s -append nokaslr
+
+ddd --debugger gdb vmlinux
+(dbg) target remote localhost:1234
+(dbg) b start_kernel
+(should say Breakpoint 1 at 0xc0008858: file init/main.c, line ###.)
+(dbg) c
+
+x86_64 emulator debug options:
+-gdb dev        wait for gdb connection on 'dev'
+-s              shorthand for -gdb tcp::1234
+-d item1,...    enable logging of specified items (use '-d help' for a list of log items)
+-D logfile      output log to logfile (default stderr)
+-dfilter range,..  filter debug output to range of addresses (useful for -d cpu,exec,etc..)
+
+For ARM:
+export ARCH=arm64
+export SUBARCH=arm64
+export CROSS_COMPILE=${ANDROID_BUILD_TOP}/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-
+export CROSS_COMPILE=${ANDROID_BUILD_TOP}/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androideabi-
+make ranchu64_defconfig
+
+For x86:
+export ARCH=x86_64
+export SUBARCH=x86_64
+export CROSS_COMPILE=${ANDROID_BUILD_TOP}/prebuilts/gcc/linux-x86/x86/x86_64-linux-android-4.9/bin/x86_64-linux-android-
+make x86_64_defconfig
+
+To make goldfish kernel:
+make LOCAL_CFLAGS="-O0 -ggdb" -j8
+
+
+change python to 2.x: alias python='/usr/bin/python2.7'

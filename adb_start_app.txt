@@ -1,0 +1,2 @@
+am start com.example.helloandroid/com.example.helloandroid.MainActivity
+echo 0 > /sys/fs/selinux/enforce

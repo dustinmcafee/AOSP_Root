@@ -1,0 +1,1 @@
+supolicy --live "allow appdomain input_device dir { ioctl read getattr search open }" "allow appdomain input_device chr_file { ioctl read write getattr lock append open }"

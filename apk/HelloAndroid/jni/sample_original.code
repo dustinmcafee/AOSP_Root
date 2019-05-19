@@ -1,0 +1,53 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/syscall.h>
+#include <sys/types.h>
+
+#include <linux/input-event-codes.h>
+
+//x86_64
+//#define __NR_esm_register 397
+//#define __NR_esm_wait 398
+//x86_32
+//#define __NR_esm_register 332
+//#define __NR_esm_wait 333
+//goldfish/include/asm-generic
+//#define __NR_esm_register 291
+//#define __NR_esm_wait 292
+
+struct input_value {
+    __u16 type;
+    __u16 code;
+    __s32 value;
+};
+
+struct input_value value = {
+    .type = EV_KEY,
+    .code = BTN_LEFT
+};
+
+pid_t pid;
+
+void click_handler(struct input_value* event){
+    printf("We did it!\n%d\n",event->value);
+
+//    int err = syscall(__NR_esm_register, pid, value.type, value.code, NULL);	//397		Unregister Click Handler
+    int err = syscall(SYS_esm_register, pid, value.type, value.code, NULL);	//397		Unregister Click Handler
+    if(err == -1){printf("error with unregistering handler with esm\n");}
+    printf("Finished\n");
+}
+
+int main(int argc, char** argv)
+{
+    pid = getpid();
+//    int err = syscall(__NR_esm_register, pid, value.type, value.code, click_handler);		//397		Register Click Handler
+    int err = syscall(SYS_esm_register, pid, value.type, value.code, click_handler);		//397		Register Click Handler
+    if(err == -1){printf("error with esm register\n");}
+
+    printf("esm wait call on pid %d\n", pid);
+//    err = syscall(__NR_esm_wait, pid);						//398		ESM Wait
+    err = syscall(SYS_esm_wait, pid);							//398		ESM Wait
+    if(err == -1){printf("error with esm wait\n");}
+
+    return 0;
+}

@@ -1,0 +1,1 @@
+adb logcat -v threadtime chatty:S audio_hw_primary:S wpa_supplicant:S MSM-irqbalance:S bt_btif_dm:S bt_btif_config:S bt_btif:S bt_btm_ble:S bt_btm:S bt_logger:S cnss-daemon:S APPETIZE_LOGS:S APPETIZE_TESTING:S APPETIZE_API:S DisplayMetaData:S | tee output.txt | logcat-color
